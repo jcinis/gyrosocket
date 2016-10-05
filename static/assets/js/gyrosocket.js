@@ -26,9 +26,8 @@ GyroSocket.prototype.deviceOrientationListener = function(event) {
       "beta": Math.round(event.beta),
       "gamma": Math.round(event.gamma)
   }
-  
+
   if(JSON.stringify(this.value) != JSON.stringify(value)){
-      console.log(this.value, value, this.value.toString() == value.toString());
       this.changeValue(value);
   }
 }
@@ -67,8 +66,9 @@ GyroSocket.prototype.valueChangeEvent = function(){
 //});
 
 
-
-var gyroSocket = new GyroSocket('/');
+//var uri = '/device/12345';
+var uri = '/gyrosocket';
+var gyroSocket = new GyroSocket(uri);
 window.addEventListener('deviceorientation', function(event){
   gyroSocket.deviceOrientationListener(event);
 });
@@ -78,3 +78,5 @@ window.addEventListener('GyroSocketValue',function(event){
   document.getElementById("beta").innerHTML = "beta: " + gyroSocket.value.beta;
   document.getElementById("gamma").innerHTML = "gamma: " + gyroSocket.value.gamma;
 });
+
+gyroSocket.changeValue({ 'alpha':9, 'beta':9, 'gamma':9 });
