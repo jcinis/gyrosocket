@@ -1,7 +1,7 @@
 {
-  "name": "gyroscope",
+  "name": "gyrosocket",
   "version": "1.0.0",
-  "description": "",
+  "description": "Socket.io interface for pushing phone gyroscope to node.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

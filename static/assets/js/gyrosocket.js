@@ -12,16 +12,12 @@ function GyroSocket(uri) {
   this.uri = uri;
   this.has_motion = true;
 
-  // Start this party
-  this.init();
+  this.socket = io.connect(uri);
+  console.log('Initializing GyroSocket');
 }
 
 GyroSocket.prototype.getValue = function(){
   return this.value;
-}
-
-GyroSocket.prototype.init = function(){
-  console.log('Initializing GyroSocket');
 }
 
 GyroSocket.prototype.deviceOrientationListener = function(event) {
@@ -30,14 +26,16 @@ GyroSocket.prototype.deviceOrientationListener = function(event) {
       "beta": Math.round(event.beta),
       "gamma": Math.round(event.gamma)
   }
-
-  if(this.value != value){
+  
+  if(JSON.stringify(this.value) != JSON.stringify(value)){
+      console.log(this.value, value, this.value.toString() == value.toString());
       this.changeValue(value);
   }
 }
 
 GyroSocket.prototype.changeValue = function(value) {
   this.value = value;
+  this.socket.emit('gyrosocket-value', this.getValue());
   window.dispatchEvent(this.valueChangeEvent());
 }
 
@@ -62,7 +60,15 @@ GyroSocket.prototype.valueChangeEvent = function(){
 
 // Main Program ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-var gyroSocket = new GyroSocket('/socket');
+//var socket = io.connect('http://localhost:8000/');
+//socket.on('news', function (data) {
+//  console.log(data);
+//  socket.emit('my other event', { my: 'data' });
+//});
+
+
+
+var gyroSocket = new GyroSocket('/');
 window.addEventListener('deviceorientation', function(event){
   gyroSocket.deviceOrientationListener(event);
 });
