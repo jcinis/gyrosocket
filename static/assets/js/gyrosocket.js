@@ -1,32 +1,61 @@
 function GyroSocketException() {};
 function GyroSocketDeviceMotionException() {};
 
-function GyroSocket(uri) {
+function GyroSocket(options) {
+  /*
+  GyroSocket utilizes the sockets.io library as well as the browser's
+  deviceorientation events to send signals from a phone to a webpage
+  */
 
+  // Set options
+  this.debug = options && options.debug ? true : false;
+  this.uri = options && options.uri ? options.uri : '/gyrosocket';
+  this.onchange = options && options.onchange ? options.onchange : undefined;
+  this.serving = false;
+  this.listening = false;
+
+  // Set default values
   this.value = {
     'alpha':0,
     'beta':0,
     'gamma':0
   }
 
-  this.uri = uri;
-  this.has_motion = true;
-
+  // Connect to socket.io
   this.socket = io.connect(uri);
-  console.log('Initializing GyroSocket');
+
 }
 
 GyroSocket.prototype.getValue = function(){
   return this.value;
 }
 
+GyroSocket.prototypes.server = function(){
+  var self = this;
+
+  if(!this.serving){
+    this.serving = true;
+
+    // listen for device orientation changes
+    window.addEventListener('deviceorientation', function(event){
+      self.deviceOrientationListener(event);
+    });
+
+    if(this.debug) console.log('Initializing GyroSocket Server');
+  }
+}
+
 GyroSocket.prototype.deviceOrientationListener = function(event) {
+  var self = this;
+
+  // Set the new value rounded to the nearest integer
   var value = {
       "alpha": Math.round(event.alpha),
       "beta": Math.round(event.beta),
       "gamma": Math.round(event.gamma)
   }
 
+  // Check to see if the value has changed before emmitting a new value
   if(JSON.stringify(this.value) != JSON.stringify(value)){
       this.changeValue(value);
   }
@@ -34,12 +63,12 @@ GyroSocket.prototype.deviceOrientationListener = function(event) {
 
 GyroSocket.prototype.changeValue = function(value) {
   this.value = value;
-  this.socket.emit('gyrosocket-value', this.getValue());
+  this.socket.emit('value', this.getValue());
   window.dispatchEvent(this.valueChangeEvent());
+  if(this.onchange) this.onchange(this.value);
 }
 
 GyroSocket.prototype.valueChangeEvent = function(){
-
   var event = new CustomEvent(
     "GyroSocketValue",
     {
@@ -55,28 +84,3 @@ GyroSocket.prototype.valueChangeEvent = function(){
 
   return event;
 }
-
-
-// Main Program ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-//var socket = io.connect('http://localhost:8000/');
-//socket.on('news', function (data) {
-//  console.log(data);
-//  socket.emit('my other event', { my: 'data' });
-//});
-
-
-//var uri = '/device/12345';
-var uri = '/gyrosocket';
-var gyroSocket = new GyroSocket(uri);
-window.addEventListener('deviceorientation', function(event){
-  gyroSocket.deviceOrientationListener(event);
-});
-
-window.addEventListener('GyroSocketValue',function(event){
-  document.getElementById("alpha").innerHTML = "alpha: " + gyroSocket.value.alpha;
-  document.getElementById("beta").innerHTML = "beta: " + gyroSocket.value.beta;
-  document.getElementById("gamma").innerHTML = "gamma: " + gyroSocket.value.gamma;
-});
-
-gyroSocket.changeValue({ 'alpha':9, 'beta':9, 'gamma':9 });

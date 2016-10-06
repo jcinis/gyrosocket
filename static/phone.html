@@ -13,5 +13,20 @@
     <div id="gamma"></div>
     <script type="text/javascript" src="/assets/js/socket.io.js"></script>
     <script type="text/javascript" src="/assets/js/gyrosocket.js"></script>
+    <script>
+
+      var gyroSocket = new GyroSocket({
+        uri:'/gyrosocket',
+        onchange: function(value){
+          document.getElementById("alpha").innerHTML = "alpha: " + gyroSocket.value.alpha;
+          document.getElementById("beta").innerHTML = "beta: " + gyroSocket.value.beta;
+          document.getElementById("gamma").innerHTML = "gamma: " + gyroSocket.value.gamma;
+        }
+      }).send();
+
+      // Send a test value
+      gyroSocket.changeValue({ 'alpha':9, 'beta':9, 'gamma':9 });
+
+    </script>
   </body>
 </html>
