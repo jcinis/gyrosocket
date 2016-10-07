@@ -15,17 +15,23 @@
     <script type="text/javascript" src="/assets/js/gyrosocket.js"></script>
     <script>
 
+      var DEBUG = true;
+
+      function gyroSocketOnChange(value) {
+        document.getElementById("alpha").innerHTML = "alpha: " + value.alpha;
+        document.getElementById("beta").innerHTML = "beta: " + value.beta;
+        document.getElementById("gamma").innerHTML = "gamma: " + value.gamma;
+      }
+
+      // Initialize GyroSocket instance
       var gyroSocket = new GyroSocket({
-        uri:'/gyrosocket',
-        onchange: function(value){
-          document.getElementById("alpha").innerHTML = "alpha: " + gyroSocket.value.alpha;
-          document.getElementById("beta").innerHTML = "beta: " + gyroSocket.value.beta;
-          document.getElementById("gamma").innerHTML = "gamma: " + gyroSocket.value.gamma;
-        }
+        uri: '/gyrosocket',
+        onchange: gyroSocketOnChange,
+        debug: DEBUG
       }).send();
 
       // Send a test value
-      gyroSocket.changeValue({ 'alpha':9, 'beta':9, 'gamma':9 });
+      if(DEBUG) gyroSocket.setValue({ 'alpha':9, 'beta':9, 'gamma':9 });
 
     </script>
   </body>

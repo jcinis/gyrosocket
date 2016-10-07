@@ -12,16 +12,25 @@
     <div id="beta"></div>
     <div id="gamma"></div>
     <script type="text/javascript" src="/assets/js/socket.io.js"></script>
+    <script type="text/javascript" src="/assets/js/gyrosocket.js"></script>
     <script>
 
-      var socket = io.connect('/gyrosocket');
-      socket.on('value', function(data) {
-        document.getElementById("alpha").innerHTML = "alpha: " + data.alpha;
-        document.getElementById("beta").innerHTML = "beta: " + data.beta;
-        document.getElementById("gamma").innerHTML = "gamma: " + data.gamma;
-        console.log(data);
-      });
+      var DEBUG = true;
 
+      function gyroSocketOnChange(value) {
+        document.getElementById("alpha").innerHTML = "alpha: " + value.alpha;
+        document.getElementById("beta").innerHTML = "beta: " + value.beta;
+        document.getElementById("gamma").innerHTML = "gamma: " + value.gamma;
+        if(DEBUG) console.log(value);
+      }
+
+      // Initialize GyroSocket instance
+      var gyroSocket = new GyroSocket({
+        uri: '/gyrosocket',
+        onchange: gyroSocketOnChange,
+        debug: DEBUG
+      }).receive();
+      
     </script>
   </body>
 </html>
